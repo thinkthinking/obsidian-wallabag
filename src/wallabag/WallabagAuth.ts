@@ -15,11 +15,16 @@ export const storeTokenToVault = async (plugin: WallabagPlugin, token: Token): P
 
 export const loadTokenFromVault = async (plugin: WallabagPlugin): Promise<Token | undefined> => {
   const path = tokenVaultPath(plugin);
+  console.log('Attempting to load token from path:', path);
   return plugin.app.vault.adapter.exists(path).then(async (exists) => {
+    console.log('Token file exists:', exists);
     if (!exists) {
+      console.log('Token file not found');
       return undefined;
     } else {
-      return JSON.parse(await plugin.app.vault.adapter.read(path));
+      const tokenContent = await plugin.app.vault.adapter.read(path);
+      console.log('Token loaded:', tokenContent);
+      return JSON.parse(tokenContent);
     }
   });
 };

@@ -52,6 +52,30 @@ export class WallabagSettingTab extends PluginSettingTab {
           get: () => this.plugin.settings.articleTemplate,
           set: this.updateSetting('articleTemplate'),
         },
+        {
+          name: 'Folder Template',
+          desc: sanitizeHTMLToDom(
+            'Template for folder structure. Available variables: {{folder}}, {{tags}}, {{date}}, {{title}}.<br>' +
+            'Example: {{folder}}/{{tags}}/{{date}}'
+          ),
+          get: () => this.plugin.settings.folderTemplate,
+          set: this.updateSetting('folderTemplate'),
+        },
+        {
+          name: 'Folder Date Format',
+          desc: sanitizeHTMLToDom(
+            'Date format for folder names. Uses moment.js format.<br>' +
+            'Example: YYYY/MM/DD'
+          ),
+          get: () => this.plugin.settings.folderDateFormat,
+          set: this.updateSetting('folderDateFormat'),
+        },
+        {
+          name: 'Base Path',
+          desc: 'Base path for all notes (optional). Leave empty to use vault root.',
+          get: () => this.plugin.settings.basePath,
+          set: this.updateSetting('basePath'),
+        },
       ] as TextSetting[]
     ).forEach(this.addTextSettingHere);
 

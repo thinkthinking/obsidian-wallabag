@@ -19,6 +19,9 @@ There are various settings under the plugin settings you can use to personalize 
 | :----------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------ |
 | Tag to sync                                            | Use this for syncing only the articles tagged with tag. If empty plugin will sync all the articles.                 |
 | Article Notes Folder                                   | Define the folder you want synced notes will be created. If empty notes will be created at the vault root.          |
+| Base Path                                              | Define a base directory for all notes. All other folder paths will be relative to this base path.                   |
+| Folder Template                                        | Template for generating folder paths. Supports date variables like YYYY, MM, DD for organizing by date.              |
+| Folder Date Format                                     | Date format to use with folder template. For example: YYYY/MM for year/month based organization.                    |
 | Article Note Template                                  | Use to pass a custom template for notes. See the [Templating](#templating) for more details.                        |
 | Sync on startup                                        | If enabled, articles will be synced on startup.                                                                     |
 | Sync unread articles                                   | If enabled, unread articles will be synced.                                                                         |
@@ -67,6 +70,41 @@ annotation-target: {{pdf_link}}
 
 ![](screenshots/ss2.png)
 
+## Folder Organization
+
+The plugin now supports advanced folder organization through templates and date-based paths. Here's how to use these features:
+
+### Base Path
+
+You can set a base directory for all your Wallabag notes. All other folder paths will be relative to this base path. For example:
+- Base Path: `Wallabag/Articles`
+- Article Notes Folder: `unread`
+- Final path: `Wallabag/Articles/unread`
+
+### Folder Templates
+
+The folder template feature allows you to organize your notes using dynamic paths based on dates. This is especially useful for creating a chronological folder structure.
+
+#### Available Date Variables
+- `YYYY`: Four-digit year
+- `MM`: Two-digit month
+- `DD`: Two-digit day
+
+#### Examples:
+1. Monthly organization:
+   - Folder Template: `YYYY/MM`
+   - Result: `2024/12/article.md`
+
+2. Daily organization:
+   - Folder Template: `YYYY/MM/DD`
+   - Result: `2024/12/07/article.md`
+
+3. Custom organization:
+   - Folder Template: `Archive/YYYY-MM`
+   - Result: `Archive/2024-12/article.md`
+
+The folder template will be combined with your base path and article notes folder settings to create the final path.
+
 ## Installation
 
 ### Manually
@@ -87,7 +125,7 @@ annotation-target: {{pdf_link}}
 - Copy `main.js` and `manifest.json` (if changed) to your obsidian vault's plugin folder (e.g. `[VAULT]/.obsidian/plugins/obsidian-wallabag`).
 - Disable and re-enable the plugin in Obsidian's settings to reload it.
 
-### State
+## State
 
 Relative to `[VAULT]/.obsidian/plugins/obsidian-wallabag`:
 

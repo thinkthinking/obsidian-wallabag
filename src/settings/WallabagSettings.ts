@@ -2,6 +2,8 @@ export interface WallabagSettings {
   serverUrl: string;
   tag: string;
   folder: string;
+  folderTemplate: string;
+  folderDateFormat: string;
   downloadAsPDF: string;
   articleTemplate: string;
   pdfFolder: string;
@@ -15,12 +17,15 @@ export interface WallabagSettings {
   tagFormat: string;
   unreadFolder: string;
   archivedFolder: string;
+  basePath: string;  // 添加基础路径设置
 }
 
 export const DEFAULT_SETTINGS: WallabagSettings = {
   serverUrl: '',
   tag: '',
   folder: '',
+  folderTemplate: '{{folder}}/{{tags}}',
+  folderDateFormat: 'YYYY/MM/DD',
   downloadAsPDF: 'false',
   articleTemplate: '',
   pdfFolder: '',
@@ -34,4 +39,5 @@ export const DEFAULT_SETTINGS: WallabagSettings = {
   tagFormat: 'csv',
   unreadFolder: '',
   archivedFolder: '',
+  basePath: '',  // 默认为空，表示使用 vault 根目录
 };

@@ -1,5 +1,6 @@
 import WallabagPlugin from 'main';
 import NoteTemplate, { DefaultTemplate, PDFTemplate } from 'note/NoteTemplate';
+import FolderTemplate from 'note/FolderTemplate';
 import { Command, Notice, sanitizeHTMLToDom, normalizePath } from 'obsidian';
 import { WallabagArticle } from 'wallabag/WallabagAPI';
 
@@ -34,13 +35,25 @@ export default class SyncArticlesCommand implements Command {
   }
 
   private getFolder(wallabagArticle: WallabagArticle): string {
+    let baseFolder: string;
     if (wallabagArticle.isArchived && this.plugin.settings.archivedFolder !== '') {
-      return this.plugin.settings.archivedFolder;
+      baseFolder = this.plugin.settings.archivedFolder;
     } else if (!wallabagArticle.isArchived && this.plugin.settings.unreadFolder !== '') {
-      return this.plugin.settings.unreadFolder;
+      baseFolder = this.plugin.settings.unreadFolder;
     } else {
-      return this.plugin.settings.folder;
+      baseFolder = this.plugin.settings.folder;
     }
+
+    // 添加基础路径
+    if (this.plugin.settings.basePath) {
+      baseFolder = `${this.plugin.settings.basePath}/${baseFolder}`;
+    }
+
+    const folderTemplate = new FolderTemplate(
+      this.plugin.settings.folderTemplate,
+      this.plugin.settings.folderDateFormat
+    );
+    return folderTemplate.fill(wallabagArticle, baseFolder);
   }
 
   private getFilename(wallabagArticle: WallabagArticle): string {
@@ -53,11 +66,31 @@ export default class SyncArticlesCommand implements Command {
   }
 
   private async createNoteIfNotExists(filename: string, content: string) {
-    const exists = await this.plugin.app.vault.adapter.exists(filename);
-    if (exists) {
-      new Notice(`File ${filename} already exists. Skipping..`);
-    } else {
-      this.plugin.app.vault.create(filename, content);
+    try {
+      const exists = await this.plugin.app.vault.adapter.exists(filename);
+      if (exists) {
+        new Notice(`File ${filename} already exists. Skipping..`);
+      } else {
+        // 确保父目录存在
+        const folderPath = filename.substring(0, filename.lastIndexOf('/'));
+        if (folderPath) {
+          try {
+            await this.plugin.app.vault.createFolder(folderPath);
+          } catch (error) {
+            // 忽略"文件夹已存在"的错误
+            if (!error.message?.includes('already exists')) {
+              throw error;
+            }
+          }
+        }
+        // 创建文件
+        await this.plugin.app.vault.create(filename, content);
+      }
+    } catch (error) {
+      console.error('Error creating note:', error);
+      if (!error.message?.includes('already exists')) {
+        new Notice(`Failed to create note: ${error.message}`);
+      }
     }
   }
 

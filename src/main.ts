@@ -44,11 +44,16 @@ export default class WallabagPlugin extends Plugin {
   }
 
   async loadToken() {
+    console.log('Starting token load process');
     return loadTokenFromVault(this).then((token) => {
+      console.log('Token loaded result:', token ? 'Token found' : 'No token found');
       if (token) {
+        console.log('Initializing API with token');
         this.api = new WallabagAPI(token, this);
         this.authenticated = true;
+        console.log('Authentication status set to:', this.authenticated);
       } else {
+        console.log('No token found, showing authentication notice');
         new Notice('Please authenticate with Wallabag to start syncing.');
       }
     });
